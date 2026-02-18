@@ -1,0 +1,9 @@
+# 发票管理系统 - 单机版
+# Python 3.6+
+
+# 说明：
+# - 本程序基础功能只使用 Python 标准库（tkinter/sqlite3/json 等），无需安装任何第三方依赖
+# - OCR 功能是可选的，请按需安装：
+#   - PaddleOCR 方案：见 requirements-ocr-paddle.txt 或使用 install_ocr.bat / install_ocr.sh
+#   - Tesseract 方案：见 requirements-ocr-tesseract.txt
+# - 打包 exe：见 requirements-build.txt 与 build_exe*.bat

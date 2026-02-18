@@ -1,0 +1,11 @@
+# OCR 方案2：Tesseract（备选）
+# 安装：pip install -r requirements-ocr-tesseract.txt
+#
+# 注意：还需要安装 Tesseract-OCR 软件本体
+# Windows: https://github.com/UB-Mannheim/tesseract/wiki
+# Mac: brew install tesseract tesseract-lang
+# Linux: sudo apt-get install tesseract-ocr tesseract-ocr-chi-sim
+
+pytesseract>=0.3.10
+pillow>=9.0.0
+

@@ -1,0 +1,6 @@
+# OCR 方案1：PaddleOCR（推荐）
+# 安装：pip install -r requirements-ocr-paddle.txt
+
+paddleocr>=2.6.0
+paddlepaddle>=2.4.0
+

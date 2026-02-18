@@ -1,0 +1,140 @@
+name: 构建发票管理系统
+
+on:
+  push:
+    branches: [ main, master ]
+    tags:
+      - 'v*'
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:  # 允许手动触发
+
+jobs:
+  build-windows:
+    name: 构建 Windows EXE
+    runs-on: windows-latest
+    
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v4
+    
+    - name: 设置 Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        architecture: 'x64'
+    
+    - name: 安装依赖
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements-build.txt
+    
+    - name: 构建基础版 EXE（不含OCR）
+      run: |
+        pyinstaller --onefile --windowed --name="发票管理系统" --clean invoice_manager.py
+    
+    - name: 创建发布目录
+      run: |
+        mkdir release
+        copy dist\发票管理系统.exe release\发票管理系统-基础版.exe
+    
+    - name: 上传构建产物
+      uses: actions/upload-artifact@v4
+      with:
+        name: 发票管理系统-Windows-基础版
+        path: release/发票管理系统-基础版.exe
+        retention-days: 30
+    
+    - name: 创建发布说明
+      run: |
+        echo "# 发票管理系统 - Windows 版本" > release/README.txt
+        echo "" >> release/README.txt
+        echo "## 基础版（不含OCR功能）" >> release/README.txt
+        echo "" >> release/README.txt
+        echo "### 使用方法" >> release/README.txt
+        echo "1. 双击运行 发票管理系统-基础版.exe" >> release/README.txt
+        echo "2. 首次运行会自动创建数据库文件" >> release/README.txt
+        echo "" >> release/README.txt
+        echo "### 功能" >> release/README.txt
+        echo "- 发票录入（手动）" >> release/README.txt
+        echo "- 发票查询" >> release/README.txt
+        echo "- 发票统计" >> release/README.txt
+        echo "- 数据导出" >> release/README.txt
+        echo "" >> release/README.txt
+        echo "### 注意事项" >> release/README.txt
+        echo "- 此版本不包含OCR识别功能" >> release/README.txt
+        echo "- 如需OCR功能，请使用完整版" >> release/README.txt
+        echo "- 数据文件 invoices.db 请妥善保管" >> release/README.txt
+    
+    - name: 上传发布说明
+      uses: actions/upload-artifact@v4
+      with:
+        name: 使用说明
+        path: release/README.txt
+        retention-days: 30
+
+  build-windows-with-ocr:
+    name: 构建 Windows EXE（含OCR）
+    runs-on: windows-latest
+    
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v4
+    
+    - name: 设置 Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        architecture: 'x64'
+    
+    - name: 安装依赖
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements-build.txt
+        pip install -r requirements-ocr-paddle.txt
+    
+    - name: 构建完整版 EXE（含OCR）
+      run: |
+        pyinstaller --onefile --windowed --name="发票管理系统-完整版" --clean invoice_manager.py
+    
+    - name: 创建发布目录
+      run: |
+        mkdir release-ocr
+        copy dist\发票管理系统-完整版.exe release-ocr\发票管理系统-完整版.exe
+    
+    - name: 上传构建产物
+      uses: actions/upload-artifact@v4
+      with:
+        name: 发票管理系统-Windows-完整版
+        path: release-ocr/发票管理系统-完整版.exe
+        retention-days: 30
+    
+    - name: 创建发布说明
+      run: |
+        echo "# 发票管理系统 - Windows 完整版（含OCR）" > release-ocr/README.txt
+        echo "" >> release-ocr/README.txt
+        echo "## 完整版（包含OCR识别功能）" >> release-ocr/README.txt
+        echo "" >> release-ocr/README.txt
+        echo "### 使用方法" >> release-ocr/README.txt
+        echo "1. 双击运行 发票管理系统-完整版.exe" >> release-ocr/README.txt
+        echo "2. 首次运行会自动创建数据库文件" >> release-ocr/README.txt
+        echo "3. 点击'新增发票' -> 'OCR识别发票'即可使用OCR功能" >> release-ocr/README.txt
+        echo "" >> release-ocr/README.txt
+        echo "### 功能" >> release-ocr/README.txt
+        echo "- 发票录入（手动 + OCR识别）" >> release-ocr/README.txt
+        echo "- 发票查询" >> release-ocr/README.txt
+        echo "- 发票统计" >> release-ocr/README.txt
+        echo "- 数据导出" >> release-ocr/README.txt
+        echo "- OCR图片识别" >> release-ocr/README.txt
+        echo "" >> release-ocr/README.txt
+        echo "### 注意事项" >> release-ocr/README.txt
+        echo "- 此版本包含PaddleOCR，文件较大（约200-300MB）" >> release-ocr/README.txt
+        echo "- 首次使用OCR功能可能需要下载模型" >> release-ocr/README.txt
+        echo "- 数据文件 invoices.db 请妥善保管" >> release-ocr/README.txt
+    
+    - name: 上传发布说明
+      uses: actions/upload-artifact@v4
+      with:
+        name: 使用说明-完整版
+        path: release-ocr/README.txt
+        retention-days: 30
