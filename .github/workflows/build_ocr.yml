@@ -1,0 +1,66 @@
+name: 构建 OCR 证件识别工具
+
+on:
+  push:
+    branches: [ main, master ]
+    tags:
+      - 'v*'
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:  # 允许手动触发
+
+jobs:
+  build-ocr-windows:
+    name: 构建 OCR.exe (Windows)
+    runs-on: windows-latest
+    
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v4
+    
+    - name: 设置 Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        architecture: 'x64'
+    
+    - name: 安装依赖
+      run: |
+        python -m pip install --upgrade pip
+        pip install pyinstaller
+        pip install -r requirements-ocr-baidu.txt
+    
+    - name: 构建 OCR.exe
+      run: |
+        cd OCR单一功能版
+        pyinstaller --onefile --windowed --name="OCR" --clean --paths=.. --hidden-import=aip --hidden-import=baidu_ocr --hidden-import=baidu_settings_dialog ocr_app.py
+    
+    - name: 创建 Windows 发布包
+      run: |
+        mkdir release_ocr_win
+        copy OCR单一功能版\dist\OCR.exe release_ocr_win\OCR.exe
+        copy release_win\baidu_ocr_config.example.json release_ocr_win\baidu_ocr_config.example.json
+        copy release_win\使用说明.txt release_ocr_win\使用说明.txt
+    
+    - name: 打包为 ZIP
+      run: |
+        cd release_ocr_win
+        powershell Compress-Archive -Path * -DestinationPath ..\OCR_Windows.zip -Force
+        cd ..
+    
+    - name: 上传构建产物
+      uses: actions/upload-artifact@v4
+      with:
+        name: OCR_Windows_完整版
+        path: OCR_Windows.zip
+        retention-days: 30
+    
+    - name: 创建 Release（如果是 tag）
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: softprops/action-gh-release@v1
+      with:
+        files: OCR_Windows.zip
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
