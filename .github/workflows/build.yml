@@ -41,7 +41,7 @@ jobs:
     - name: 上传构建产物
       uses: actions/upload-artifact@v4
       with:
-        name: 发票管理系统-Windows-基础版
+        name: InvoiceManager-Windows-Basic
         path: release/发票管理系统-基础版.exe
         retention-days: 30
     
@@ -69,7 +69,7 @@ jobs:
     - name: 上传发布说明
       uses: actions/upload-artifact@v4
       with:
-        name: 使用说明
+        name: README-Basic
         path: release/README.txt
         retention-days: 30
 
@@ -105,7 +105,7 @@ jobs:
     - name: 上传构建产物
       uses: actions/upload-artifact@v4
       with:
-        name: 发票管理系统-Windows-完整版
+        name: InvoiceManager-Windows-OCR
         path: release-ocr/发票管理系统-完整版.exe
         retention-days: 30
     
@@ -135,6 +135,6 @@ jobs:
     - name: 上传发布说明
       uses: actions/upload-artifact@v4
       with:
-        name: 使用说明-完整版
+        name: README-OCR
         path: release-ocr/README.txt
         retention-days: 30
