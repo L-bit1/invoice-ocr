@@ -1,0 +1,6 @@
+# Nuitka 打包依赖（Windows 下生成 exe 时使用）
+nuitka>=2.0
+ordered-set
+zstandard
+# OCR 运行依赖（打包时会一起打进 exe）
+-r requirements-ocr-baidu.txt
